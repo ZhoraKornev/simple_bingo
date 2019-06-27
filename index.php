@@ -58,15 +58,28 @@ $card = generateCard();
 // Print card
 function printCard($card){ ?>
     <table border="1" cellspacing="0" cellpadding="5">
-
-        <?php foreach ($card as $index => $rij) { ?>
-            <tr>
-
-                <?php foreach ($rij as $columnIndex => $number) { ?>
-                    <td><?php echo $number ?></td>
-                <?php } ?>
+        <?php
+        $row = 0;
+        foreach ($card as $index => $rij)
+        {
+            $row++;
+            if ($row < 7)
+            {?>
+                <tr>
+                <?php
+                $column = 0;
+                foreach ($rij as $columnIndex => $number)
+                {
+                    $column++;
+                    if ($column < 7)
+                    {       ?>
+                        <td<?php if (($rij[6]==6) || ($card[7][$column-1] ==6)) {  echo ' style="background-color:green"'; } ?>><?php echo $number ?></td>
+                    <?php    }
+                }
+            } ?>
             </tr>
-        <?php } ?>
+            <?php
+        } ?>
     </table>
 <?php }
 
@@ -78,12 +91,11 @@ $deck = range(10,69);
 $bingo = false;
 
 // Keep drawing numbers till bingo is true
+// Keep drawing numbers till bingo is true
 while (!$bingo){
-
     $index = mt_rand(0,count($deck) - 1);
 
     $number = $deck[$index];
-
 
     if(!in_array($number, $getrokkenGetallen)){
 
@@ -103,17 +115,18 @@ while (!$bingo){
 
                         $card[$row][6] += 1; // Increment col
                         $card[7][$rownumber] += 1; // Increment row
+                        // check if the 7th column or row contains 6 positive draws (5 for testing)
+                        if(($card[$row][6] == 6) || ($card[7][$rownumber] == 6)){
+                            $bingo = true;
+                        }
+                        break;
                     }
                 }
             }
         }
-    }
-// check if the 7th column or row contains 6 positive draws (5 for testing)
-    if(in_array(6, $card[$row]) || in_array(6, $card[$rownumber])){
-        $bingo = true;
+
     }
 }
-
 
 
 if($bingo){
