@@ -1,154 +1,106 @@
 <html>
-<body>
-
-<?php
-
-// Seeding
-mt_srand((double)microtime() * 1000000);
-
-// generate numbers for the bingo card
-function generateCard()
-{
-
-    $card = array();
-
-    $arrWithNumbers = [];
-    for ($number = 1; $number < 22; ++$number) {
-        $arrWithNumbers[$number] = $number;
-    }
-
-    for ($row = 1; $row < 6; ++$row) {
-
-        $card[$row] = array();
-
-        $deck = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-
-
-        // add 6 numbers to the row
-        for ($rownumber = 0; $rownumber < 6; ++$rownumber) {
-            // Random index
-            $index = mt_rand(0, count($deck) - 1);
-
-            // Random number from $deck
-            $number = $deck[$index];
-
-            // add row to random number (e.g. row 1 and number 8 = 18)
-            $card[$row][] = $row . $number;
-
-            // take out current random number so it wont be drawn again
-            unset($deck[$index]);
-
-            // Reset the index of $deck, so no unset is chosen
-            $deck = array_values($deck);
-
+<head>
+    <title>loto</title>
+    <style>
+        body {
+            background: rgb(204, 204, 204);
         }
 
-        // Last column
-        $card[$row][] = 0;
+        page[size="A4"] {
+            background: white;
+            width: 21cm;
+            height: 29.7cm;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5cm;
+            box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+        }
+
+        @media print {
+            body, page[size="A4"] {
+                margin: 0;
+                box-shadow: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<page size="A4">
+    <?php
+
+    // Seeding
+    mt_srand((double)microtime() * 1000000);
+
+    // generate numbers for the bingo card
+    function generateCard()
+    {
+
+        $card = array();
+        $arrWithNumbers = [];
+        for ($number = 0; $number <= 21; ++$number) {
+            $arrWithNumbers[$number] = $number;
+        }
+
+        for ($row = 1; $row <= 8; ++$row) {
+
+            $card[$row] = array();
+            while (array_count_values($card[$row])[0] != 2) {
+                $card[$row][mt_rand(0, 4)] = 0;
+            }
+
+            // add 5 numbers to the row
+            for ($column = 0; $column <= 4; ++$column) {
+
+                if (isset($card[$row][$column]) and $card[$row][$column] == 0) {
+                    continue;
+                }
+                // add row to random number (e.g. row 1 and number 8 = 18)
+                $card[$row][$column] = mt_rand(1, 21);
+            }
+            ksort($card[$row]);
+        }
+
+        return $card;
     }
 
-    // Last row
-    for ($col = 0; $col < 6; ++$col) {
-        $card[7][$col] = 0;
-    }
 
-
-    return $card;
-}
-
-
-$card = generateCard();
-
-// Print card
-function printCard($card)
-{ ?>
-    <table border="1" cellspacing="0" cellpadding="5">
-        <?php
+    // Print card
+    function printCard($card)
+    {
+        echo '<table border="1" cellspacing="0" cellpadding="5">';
         $row = 0;
         foreach ($card as $index => $rij) {
             $row++;
-            if ($row < 7) {
-                ?>
-                <tr>
-                <?php
+            if ($row < 5) {
+                echo '<tr style="text-align:center;vertical-align:top">';
                 $column = 0;
                 foreach ($rij as $columnIndex => $number) {
                     $column++;
-                    if ($column < 7) { ?>
-                        <td<?php if (($rij[6] == 6) || ($card[7][$column - 1] == 6)) {
-                            echo ' style="background-color:green"';
-                        } ?>><?php echo $number ?></td>
-                    <?php }
-                }
-            } ?>
-            </tr>
-            <?php
-        } ?>
-    </table>
-<?php }
-
-
-$getrokkenGetallen = array();
-
-$deck = range(10, 69);
-
-$bingo = false;
-
-// Keep drawing numbers till bingo is true
-// Keep drawing numbers till bingo is true
-while (!$bingo) {
-    $index = mt_rand(0, count($deck) - 1);
-
-    $number = $deck[$index];
-
-    if (!in_array($number, $getrokkenGetallen)) {
-
-        unset($deck[$index]);
-
-        $deck = array_values($deck);
-
-        $getrokkenGetallen[] = $number;
-
-        // Check if number is on the card
-        for ($row = 0; $row < 7; $row++) {
-            for ($rownumber = 0; $rownumber < 7; $rownumber++) {
-                if (isset($card[$row][$rownumber])) {
-                    if ($card[$row][$rownumber] == $number) {
-
-                        // set color?
-
-                        $card[$row][6] += 1; // Increment col
-                        $card[7][$rownumber] += 1; // Increment row
-                        // check if the 7th column or row contains 6 positive draws (5 for testing)
-                        if (($card[$row][6] == 6) || ($card[7][$rownumber] == 6)) {
-                            $bingo = true;
+                    if ($column < 7) {
+                        echo '<td ';
+                        if ($number == 0) {
+                            echo ' style="background-color:black;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:20px 19px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;"';
+                        } else {
+                            echo ' style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:20px 19px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;"';
                         }
-                        break;
+                        echo '>';
+                        echo $number;
+                        echo '</td>';
                     }
                 }
             }
+            echo '</tr>';
         }
-
+        echo '</table>';
     }
-}
 
 
-if ($bingo) {
-
-    printCard($card);
-
-
-    echo '<p>Drawn numbers are:<br>';
-    foreach ($getrokkenGetallen as $value) {
-        echo $value . ' ';
+    for ($quantityOgCards = 0; $quantityOgCards <= 4; ++$quantityOgCards) {
+        $card = generateCard();
+        printCard($card);
     }
-    echo '</p>';
-
-
-    echo '<p>Times drawn: ';
-    echo count($getrokkenGetallen);
-    echo '</p>';
-}
-?>
+    ?>
+    <button onclick="window.print();return false;">Печать</button>
+</page>
 </body>
 </html>
