@@ -40,7 +40,7 @@
 
         $card = array();
         $arrWithNumbers = [];
-        for ($number = 0; $number <= 21; ++$number) {
+        for ($number = 0; $number <= 24; ++$number) {
             $arrWithNumbers[$number] = $number;
         }
 
