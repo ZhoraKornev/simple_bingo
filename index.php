@@ -21,6 +21,9 @@
                 margin: 0;
                 box-shadow: 0;
             }
+            .print-button {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -100,7 +103,7 @@
         printCard($card);
     }
     ?>
-    <button onclick="window.print();return false;">Печать</button>
+    <button onclick="window.print();return false;" class="print-button">Печать</button>
 </page>
 </body>
 </html>
